@@ -41,7 +41,7 @@ export const productById = (id) => {
 }
 
 export const deleteProduct = (id) => {
-    const request = axios.get(`http://localhost:8000/product/delete-product/ ${id} `,
+    const request = axios.get(`http://localhost:8000/product/${id} `,
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,

@@ -1,7 +1,7 @@
 const initialState = {
-        product: [],
+        products: [],
         categories: [],
-        products: {},
+        product: {},
         productShow: []
 }
 

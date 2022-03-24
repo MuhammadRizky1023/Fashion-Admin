@@ -70,7 +70,7 @@ const Login = ({setIsLogin}) => {
       );
 
       localStorage.setItem('isLogin', JSON.stringify(true));
-        localStorage.setItem('adminToken', res.data.data.access_token);
+        localStorage.setItem('token', res.data.data.access_token);
 
         history.push('/admin/')
 

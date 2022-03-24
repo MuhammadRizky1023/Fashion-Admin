@@ -1,77 +1,52 @@
-
-
 import React, { useState, useRef } from "react";
 import { Form, Button } from "react-bootstrap";
 import { IKContext, IKUpload } from "imagekitio-react";
 import { Link } from "react-router-dom";
 import "../css/NewProduct.css";
 import useRouter from "use-react-router";
-import { connect, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import axios from "axios";
 const NewProducts = () => {
+  const { products} = useSelector((state) => state.productReucer)
   const { history } = useRouter();
 
-  const [fileData, setFileData] = useState();
-
-  const fileChange = (e) => {
-    setFileData(e.target.files[0]);
-  };
-
   const [productData, setProductData] = useState({
-    id: "",
-    title: "",
-    description: "",
-    image: "",
-    price: "",
-    stock: "",
+    id: '',
+    title:  '',
+    description: '',
+    image: '',
+    price: '',
+    stock: '',
     category_id: 0
   });
 
+  const [file, setFile] = useState('')
+  const [fileName, setFileName] = useState('choosen file')
+  const [upload, setUpload] = useState()
+  const [updoaldFile, setUploadFile] = useState({})
   const onChangeField = (e) => {
     setProductData({
       ...productData,
       [e.target.id]: e.target.value
     });
+
+    setFile(e.target.files[0])
+    setFileName(e.target.files[0].name)
   };
 
-  const onError = (Error) => {
-    console.log(Error);
-  };
 
-  const onSucces = (res) => {
-    setProductData({
-      ...productData,
-      image: res.url
-    });
-  };
-  const onFormHandler = (e) => {
-    e.preventDefault();
-
-    // Handle File Data from the state Before Sending
-    const data = new FormData();
-
-    data.append("image", fileData);
-
-    fetch("http://localhost:8000/product/post", {
-      method: "POST",
-      body: data
-    })
-      .then((result) => {
-        console.log("File Sent Successful");
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-  };
+ 
   const onSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append('file', file)
     try {
       const request = await axios.post(
-        "http://localhost:8000/product/new-product",
+        'http://localhost:8000/product',
         productData,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("AdminToken")}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`
           }
         }
       );
@@ -82,11 +57,38 @@ const NewProducts = () => {
     } catch (error) {
       console.log(error.message);
     }
+
+    try {
+      const request = await axios.post('http://localhost:8000/post', productData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      )
+      if (request.data.code === 200) {
+        alert("image has been successfully");
+        history.push("/admin/");
+
+        const { fileName, filePath } = request.data;
+
+        setUploadFile({ fileName, filePath });
+  
+      }
+
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
+
+  
   return (
     <div className="form">
       <h1>Add Product</h1>
+      {products &&
+        products.length !== 0 &&
+        Object.keys(products).length !== 0 ? (
       <Form>
         <Form.Group className="mb-3">
           <Form.Label>Product Name</Form.Label>
@@ -110,7 +112,7 @@ const NewProducts = () => {
           />
         </Form.Group>
 
-        <Form.Group className="mb-3 image" onSubmit={onFormHandler }>
+        <Form.Group className="mb-3 image" >
           <div className="current-image">
             <div>current image:</div>
             <img
@@ -124,7 +126,12 @@ const NewProducts = () => {
           </div>
           <input
             type="file"
+            className='custom-file-input'
+            id='customFile'
           />
+            <label className='custom-file-label' htmlFor='customFile'>
+            {fileName}
+          </label>
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -172,20 +179,18 @@ const NewProducts = () => {
               Back
             </Button>
           </Link>
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" onSubmit={onSubmit}>
             Submit
           </Button>
         </div>
-      </Form>
+        </Form>
+          ) : (
+            <div>retrieving data</div>
+          )}
     </div>
   );
 };
 
-const mapDispatchToProps = (dispatch) => {
 
-}
 
-const mapStateToProps = (state) => {
-  
-}
-export default connect()(NewProducts )
+export default NewProducts 

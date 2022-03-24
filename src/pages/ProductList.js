@@ -1,9 +1,16 @@
 import { Link } from 'react-router-dom';
 import { Card, Button } from 'react-bootstrap';
 import '../css/Homepage.css'
-import { connect } from 'react-redux';
-const ProductList = () => {
+import { connect, useSelector } from 'react-redux';
+import { getAllProducts } from '../states/action';
+import { useEffect } from 'react';
+import Product from '../components/Product';
+const ProductList = ({ getAllProducts }) => {
+  const { productShow } = useSelector((state) => state.productReducer)
   
+  useEffect(() => {
+    getAllProducts();
+  }, [getAllProducts, productShow]);
   return (
       <div className='home'>
         <Card>
@@ -15,7 +22,16 @@ const ProductList = () => {
               <div className='price'>price</div>
               <div className='details'>details</div>
               <div className='remove'>Cancel</div>
-            </div>
+          </div>
+          {productShow&&
+            productShow.length !== 0 &&
+            Object.keys(productShow).length !== 0 ? (
+              productShow.map((product) => {
+                return <Product product={product} key={product.id} />;
+              })
+            ) : (
+              <div>you have no products</div>
+            )}
             <div className='new-product'>
               <Link to={{ pathname: '/admin/new-product' }}>
                 <Button variant='primary' className='new-btn'>
@@ -30,13 +46,9 @@ const ProductList = () => {
   );
 };
 
-const mapDispatchToProps = (dispatch) => {
-
-}
-
-const mapStateToProps = (state) => {
-
-}
+const mapDispatchToProps = (dispatch) => ({
+  getAllProducts: () => dispatch(getAllProducts()),
+})
 
 
-export default connect()(ProductList)
+export default connect(null, mapDispatchToProps)(ProductList)

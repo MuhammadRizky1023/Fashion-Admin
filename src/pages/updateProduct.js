@@ -1,26 +1,28 @@
 /** @format */
-
-import React, { useState, useEffect, useRef } from "react";
+import  { useState, useEffect, useRef } from "react";
 import "../css/EditProducts.css";
 import { Form, Button } from "react-bootstrap";
-import { IKContext, IKUpload } from "imagekitio-react";
 import { Link, useParams } from "react-router-dom";
 import useRouter from "use-react-router";
-import { connect, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import axios from "axios";
-const EditProduct = () => {
+
+const EditProduct = (props) => {
+  const { products} = useSelector((state) => state.productReucer)
   const { id } = useParams();
   const history = useRouter();
 
+  
   const [productData, setProductData] = useState({
-    id: "",
-    title: "",
-    description: "",
-    image: "",
-    price: "",
-    stock: "",
-    category_id: ""
+    id: '',
+    title: '',
+    description: '',
+    image: '',
+    price: '',
+    stock: '',
+    category_id: 0,
   });
+
 
   // useEffect(() => {
   //   const product = product.find((product) => {
@@ -46,49 +48,74 @@ const EditProduct = () => {
 
   
 
+  const [file, setFile] = useState('')
+  const [fileName, setFileName] = useState('choosen file')
+  const [upload, setUpload] = useState()
+  const [updoaldFile, setUploadFile] = useState({})
   const onChangeField = (e) => {
     setProductData({
       ...productData,
-      [e.target.name]: e.target.value
+      [e.target.id]: e.target.value
     });
+
+    setFile(e.target.files[0])
+    setFileName(e.target.files[0].name)
   };
 
-  const onError = (error) => {
-    console.log(error);
-  };
 
-  const onSuccess = (res) => {
-    setProductData({
-      ...productData,
-      image: res.url
-    });
-  };
-
+ 
   const onSubmit = async (e) => {
     e.preventDefault();
-
+    const formData = new FormData();
+    formData.append('file', file)
     try {
-      const request = await axios.post('http://localhost:8000/product/update-product',
+      const request = await axios.put(
+        'http://localhost:8000/product',
         productData,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
-        },
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
       );
-      if (request.data.code === 201) {
-        alert('data has been updated successfully');
-        history.push('/admin');
+      if (request.data.code === 200) {
+        alert("product has been successfully");
+        history.push("/admin/");
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    try {
+      const request = await axios.post('http://localhost:8000/post', productData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      )
+      if (request.data.code === 200) {
+        alert("image has been successfully");
+        history.push("/admin/");
+
+        const { fileName, filePath } = request.data;
+
+        setUploadFile({ fileName, filePath });
+  
       }
 
     } catch (error) {
-      console.error(error.message);
+      console.log(error.message);
     }
   };
+
 
   return (
     <div className="form">
       <h1>Update Product</h1>
+      {products &&
+        products.length !== 0 &&
+        Object.keys(products).length !== 0 ? (
       <Form>
         <Form.Group className="mb-3">
           <Form.Label>Product Name</Form.Label>
@@ -125,8 +152,13 @@ const EditProduct = () => {
               />
           </div>
           <input
-            type="file"
-          />
+              type="file"
+              className='custom-file-input'
+              id='customFile'
+              />
+               <label className='custom-file-label' htmlFor='customFile'>
+            {fileName}
+          </label>
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -178,16 +210,13 @@ const EditProduct = () => {
             Submit
           </Button>
         </div>
-      </Form>
+        </Form>
+          ) : (
+            <div>retrieving data</div>
+          )}
     </div>
   );
 };
 
-const mapStateToProps = (state) => {
 
-}
-
-const mapDispatchToProps = (dispatch) => {
-
-}
-export default connect()(EditProduct)
+export default EditProduct
