@@ -15,11 +15,11 @@ function App() {
       <Router>
       <ProtectedRoute  component={Dashboard} path="/admin"/>
         <Switch>
-          <Route component={Login} exact path="/login" />
+          <Route component={Login} exact={true} path="/login" />
           <Route component={Register} path="/register" />
           <ProtectedRoute  exact component={ProductList}  path="/admin/" />
-          <ProtectedRoute component={EditProduct} path="/admin/edit-product" />
-          <ProtectedRoute component={NewProducts} path="/admin/new-product" />
+          <ProtectedRoute component={EditProduct} path="/admin/update-product" />
+          <ProtectedRoute component={NewProducts} path="/admin/add-product" />
         </Switch>
     </Router>
     </div>

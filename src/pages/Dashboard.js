@@ -5,8 +5,13 @@ import {  RiLogoutBoxRFill, RiAdminFill } from 'react-icons/ri'
 import { IoBagAddSharp } from 'react-icons/io5'
 import User from '../users.jpg';
 import '../css/dashboard.css'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 export const Dashboard = () => {
+  const history = useHistory()
+  const logOut = () => {
+    localStorage.clear()
+    history.push('/login')
+  }
   return (
         <div>
         <div className="sidebar">
@@ -15,8 +20,8 @@ export const Dashboard = () => {
           <div className="sidebar-menu">
             <ul>
                 <Link to="/admin/" className="link"><li><FiShoppingBag /><span>Products</span></li></Link>
-                <Link to="/admin/new-product" className="link"><li><IoBagAddSharp/><span>NewProducts</span></li></Link>
-                <Link to="/login"className="link" ><li><RiLogoutBoxRFill/><span>Logout</span></li></Link>
+                <Link to="/admin/add-product" className="link"><li><IoBagAddSharp/><span>NewProducts</span></li></Link>
+                <li onClick={() => logOut()}><RiLogoutBoxRFill/><span>Logout</span></li>
             </ul>
             </div>
           </div>

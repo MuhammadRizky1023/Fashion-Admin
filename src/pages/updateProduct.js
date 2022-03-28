@@ -50,16 +50,7 @@ const EditProduct = () => {
     });
   };
 
-  const onError = (error) => {
-    console.log(error);
-  };
-
-  const onSuccess = (res) => {
-    setProductData({
-      ...productData,
-      image: res.url
-    });
-  };
+ 
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -83,31 +74,32 @@ const EditProduct = () => {
     // }
   };
 
-  const [image, setImage] = useState("");
-  const imageRef = useRef(null);
+  const handleUpload = async (e) => {
+    const formUpload = new FormData()
+    const imageFile = e.target.files[0]
+    formUpload.append('image', imageFile)
 
-  function useDisplayImage() {
-    const [result, setResult] = useState("");
-
-    function uploader(e) {
-      const imageFile = e.target.files[0];
-
-      const reader = new FileReader();
-      reader.addEventListener("load", (e) => {
-        setResult(e.target.result);
-      });
-
-      reader.readAsDataURL(imageFile);
+    try {
+      const upload = await axios.post(`http://localhost:8000/upload`, formUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      console.log(upload)
+      setProductData({
+        ...productData,
+        image: upload.data.data
+      })
+    } catch (error) {
+      console.log(error.message)
     }
-
-    return { result, uploader };
   }
 
-  const { result, uploader } = useDisplayImage();
-
+  
   return (
     <div className="form">
-      <h1>Edit Product</h1>
+      <h1>Update Product</h1>
       <Form>
         <Form.Group className="mb-3">
           <Form.Label>Product Name</Form.Label>
@@ -131,28 +123,24 @@ const EditProduct = () => {
           />
         </Form.Group>
 
-        <Form.Group className="mb-3 image">
+        <Form.Group className="mb-3 image" >
           <div className="current-image">
             <div>current image:</div>
-            {result && (
+            {productData.image && (
               <img
-                ref={imageRef}
-                src={result}
                 alt=""
                 style={{
                   width: "100px",
                   height: "150px",
                   backgroundSize: "contain"
                 }}
+                src={productData.image}
               />
             )}
           </div>
           <input
             type="file"
-            onChange={(e) => {
-              setImage(e.target.files[0]);
-              uploader(e);
-            }}
+            onChange={(e) => handleUpload(e)}
           />
         </Form.Group>
 

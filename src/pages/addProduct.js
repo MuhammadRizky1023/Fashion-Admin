@@ -33,23 +33,45 @@ const NewProducts = () => {
         productData,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         }
       );
       if (request.data.code === 200) {
         alert("product has been successfully");
-        history.push("/admin/");
+        // history.push("/admin/");
       }
     } catch (error) {
       console.log(error.message);
     }
   };
 
+  const handleUpload = async (e) => {
+    const formUpload = new FormData()
+    const imageFile = e.target.files[0]
+    formUpload.append('image', imageFile)
+
+    try {
+      const upload = await axios.post(`http://localhost:8000/upload`, formUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      console.log(upload)
+      setProductData({
+        ...productData,
+        image: upload.data.data
+      })
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
  
   return (
     <div className="form">
-      <h1>New Product</h1>
+      <h1>Add Product</h1>
       <Form>
         <Form.Group className="mb-3">
           <Form.Label>Product Name</Form.Label>
@@ -76,17 +98,21 @@ const NewProducts = () => {
         <Form.Group className="mb-3 image" >
           <div className="current-image">
             <div>current image:</div>
-            <img
-              alt=""
-              style={{
-                width: "100px",
-                height: "150px",
-                backgroundSize: "contain"
-              }}
-            />
+            {productData.image && (
+              <img
+                alt=""
+                style={{
+                  width: "100px",
+                  height: "150px",
+                  backgroundSize: "contain"
+                }}
+                src={productData.image}
+              />
+            )}
           </div>
           <input
             type="file"
+            onChange={(e) => handleUpload(e)}
           />
         </Form.Group>
 
