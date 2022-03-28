@@ -84,7 +84,7 @@ const Register = () => {
   };
   return (
     <Layout>
-      <div className='form'>
+      <div >
         <h1>REGISTER</h1>
         <Form>
           <Form.Group className='mb-3' controlId='formBasicEmail'>

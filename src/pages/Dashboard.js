@@ -16,7 +16,7 @@ export const Dashboard = () => {
             <ul>
                 <Link to="/admin/" className="link"><li><FiShoppingBag /><span>Products</span></li></Link>
                 <Link to="/admin/new-product" className="link"><li><IoBagAddSharp/><span>NewProducts</span></li></Link>
-                <Link to="/"className="link" ><li><RiLogoutBoxRFill/><span>Logout</span></li></Link>
+                <Link to="/login"className="link" ><li><RiLogoutBoxRFill/><span>Logout</span></li></Link>
             </ul>
             </div>
           </div>

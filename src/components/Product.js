@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { BiDetail, BiTrash } from 'react-icons/bi';
-import { deleteProduct } from '../state/reducer/action';
+import { deleteProduct } from '../states/action';
 
 const Product = ({ product, deleteProduct }) => {
   const onDelete = () => {

@@ -1,28 +1,25 @@
 /** @format */
-import  { useState, useEffect, useRef } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import "../css/EditProducts.css";
 import { Form, Button } from "react-bootstrap";
+import { IKContext, IKUpload } from "imagekitio-react";
 import { Link, useParams } from "react-router-dom";
 import useRouter from "use-react-router";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import axios from "axios";
-
-const EditProduct = (props) => {
-  const { products} = useSelector((state) => state.productReucer)
+const EditProduct = () => {
   const { id } = useParams();
-  const history = useRouter();
 
-  
   const [productData, setProductData] = useState({
-    id: '',
-    title: '',
-    description: '',
-    image: '',
-    price: '',
-    stock: '',
-    category_id: 0,
+    id: "",
+    title: "",
+    description: "",
+    image: "",
+    price: "",
+    stock: "",
+    category_id: ""
   });
-
 
   // useEffect(() => {
   //   const product = product.find((product) => {
@@ -46,76 +43,71 @@ const EditProduct = (props) => {
   //   }
   // }, [product, id])
 
-  
-
-  const [file, setFile] = useState('')
-  const [fileName, setFileName] = useState('choosen file')
-  const [upload, setUpload] = useState()
-  const [updoaldFile, setUploadFile] = useState({})
   const onChangeField = (e) => {
     setProductData({
       ...productData,
-      [e.target.id]: e.target.value
+      [e.target.name]: e.target.value
     });
-
-    setFile(e.target.files[0])
-    setFileName(e.target.files[0].name)
   };
 
+  const onError = (error) => {
+    console.log(error);
+  };
 
- 
+  const onSuccess = (res) => {
+    setProductData({
+      ...productData,
+      image: res.url
+    });
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('file', file)
-    try {
-      const request = await axios.put(
-        'http://localhost:8000/product',
-        productData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
-        }
-      );
-      if (request.data.code === 200) {
-        alert("product has been successfully");
-        history.push("/admin/");
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
 
-    try {
-      const request = await axios.post('http://localhost:8000/post', productData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
-        }
-      )
-      if (request.data.code === 200) {
-        alert("image has been successfully");
-        history.push("/admin/");
+    // try {
+    //   const request = await axios.post('http://localhost:8000/product/update-product',
+    //     productData,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${localStorage.getItem('token')}`
+    //       },
+    //     },
+    //   );
+    //   if (request.data.code === 201) {
+    //     alert('data has been updated successfully');
+    //     history.push('/admin');
+    //   }
 
-        const { fileName, filePath } = request.data;
-
-        setUploadFile({ fileName, filePath });
-  
-      }
-
-    } catch (error) {
-      console.log(error.message);
-    }
+    // } catch (error) {
+    //   console.error(error.message);
+    // }
   };
 
+  const [image, setImage] = useState("");
+  const imageRef = useRef(null);
+
+  function useDisplayImage() {
+    const [result, setResult] = useState("");
+
+    function uploader(e) {
+      const imageFile = e.target.files[0];
+
+      const reader = new FileReader();
+      reader.addEventListener("load", (e) => {
+        setResult(e.target.result);
+      });
+
+      reader.readAsDataURL(imageFile);
+    }
+
+    return { result, uploader };
+  }
+
+  const { result, uploader } = useDisplayImage();
 
   return (
     <div className="form">
-      <h1>Update Product</h1>
-      {products &&
-        products.length !== 0 &&
-        Object.keys(products).length !== 0 ? (
+      <h1>Edit Product</h1>
       <Form>
         <Form.Group className="mb-3">
           <Form.Label>Product Name</Form.Label>
@@ -142,7 +134,10 @@ const EditProduct = (props) => {
         <Form.Group className="mb-3 image">
           <div className="current-image">
             <div>current image:</div>
+            {result && (
               <img
+                ref={imageRef}
+                src={result}
                 alt=""
                 style={{
                   width: "100px",
@@ -150,15 +145,15 @@ const EditProduct = (props) => {
                   backgroundSize: "contain"
                 }}
               />
+            )}
           </div>
           <input
-              type="file"
-              className='custom-file-input'
-              id='customFile'
-              />
-               <label className='custom-file-label' htmlFor='customFile'>
-            {fileName}
-          </label>
+            type="file"
+            onChange={(e) => {
+              setImage(e.target.files[0]);
+              uploader(e);
+            }}
+          />
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -210,13 +205,8 @@ const EditProduct = (props) => {
             Submit
           </Button>
         </div>
-        </Form>
-          ) : (
-            <div>retrieving data</div>
-          )}
+      </Form>
     </div>
   );
 };
-
-
-export default EditProduct
+export default EditProduct;

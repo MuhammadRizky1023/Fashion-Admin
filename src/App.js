@@ -1,6 +1,6 @@
 
 import './App.css';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -15,7 +15,7 @@ function App() {
       <Router>
       <ProtectedRoute  component={Dashboard} path="/admin"/>
         <Switch>
-        <Route component={Login}  exact path="/login" />
+          <Route component={Login} exact path="/login" />
           <Route component={Register} path="/register" />
           <ProtectedRoute  exact component={ProductList}  path="/admin/" />
           <ProtectedRoute component={EditProduct} path="/admin/edit-product" />
